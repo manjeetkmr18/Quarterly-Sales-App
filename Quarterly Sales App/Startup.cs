@@ -33,6 +33,15 @@ namespace Quarterly_Sales_App
 
             services.AddControllersWithViews();
 
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            services.AddRazorPages();
+
+            // Enable client-side validation
+            services.AddMvc().AddViewOptions(options =>
+            {
+                options.HtmlHelperOptions.ClientValidationEnabled = true;
+            });
+
             services.AddDbContext<AppDbContext>(options =>
           options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -62,7 +71,7 @@ namespace Quarterly_Sales_App
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=SalesData}/{action=Index}/{id?}");
             });
         }
     }

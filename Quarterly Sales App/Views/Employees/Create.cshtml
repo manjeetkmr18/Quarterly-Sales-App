@@ -1,0 +1,38 @@
+﻿@model Employee
+
+<h2>Add Employee</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.FirstName)
+        @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.FirstName)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.LastName)
+        @Html.TextBoxFor(model => mod el.LastName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.LastName)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.DateOfBirth)
+        @Html.TextBoxFor(model => model.DateOfBirth, new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(model => model.DateOfBirth)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.DateOfHire)
+        @Html.TextBoxFor(model => model.DateOfHire, new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(model => model.DateOfHire)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.ManagerId)
+        @Html.DropDownListFor(model => model.ManagerId, new SelectList(ViewBag.Managers, "EmployeeId", "FullName"), "Select a manager", new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ManagerId)
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+}

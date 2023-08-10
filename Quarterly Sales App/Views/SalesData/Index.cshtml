@@ -1,0 +1,34 @@
+﻿@model List<SalesData>
+
+<h2>Quarterly Sales Data</h2>
+
+@using (Html.BeginForm("Index", "SalesData", FormMethod.Get))
+{
+    <div class="form-group">
+        @Html.Label("Filter by Employee:")
+        @Html.DropDownList("employeeId", ViewBag.EmployeeId as SelectList, "All", new { @class = "form-control", onchange = "this.form.submit();" })
+    </div>
+}
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Quarter</th>
+            <th>Year</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sales in Model)
+        {
+            <tr>
+                <td>@sales.Employee.FirstName</td>
+                <td>@sales.Quarter</td>
+                <td>@sales.Year</td>
+                <td>@sales.Amount</td>
+            </tr>
+        }
+    </tbody>
+</table>
