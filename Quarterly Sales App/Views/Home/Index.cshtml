@@ -1,8 +1,41 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@using System.Globalization;
+@model List<SalesData>
+<h2>Quarterly Sales</h2>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@using (Html.BeginForm("Index", "Home", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-md-5">
+                @Html.Label("Employee:")
+                @Html.DropDownList("employeeId", ViewBag.EmployeeId as SelectList, "All", new { @class = "form-control" })
+        </div>
+        <div class="col-md-2" style="padding: 30px;">
+            <button type="submit" class="btn btn-primary" >Filter</button>
+        </div>
+    </div>
+
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Quarter</th>
+            <th>Year</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sales in Model)
+        {
+            <tr>
+                <td>@sales.Employee.FirstName</td>
+                <td>@sales.Quarter</td>
+                <td>@sales.Year</td>
+                <td>@sales.Amount.ToString("C", CultureInfo.CurrentCulture)</td>
+            </tr>
+        }
+    </tbody>
+</table>

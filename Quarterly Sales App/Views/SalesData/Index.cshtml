@@ -1,13 +1,52 @@
-﻿@model List<SalesData>
+﻿@using System.Globalization;
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model IPagedList<SalesData>
+@{
 
-<h2>Quarterly Sales Data</h2>
+    decimal total = 0;
+}
+<h2>Quarterly Sales</h2>
 
 @using (Html.BeginForm("Index", "SalesData", FormMethod.Get))
 {
-    <div class="form-group">
-        @Html.Label("Filter by Employee:")
-        @Html.DropDownList("employeeId", ViewBag.EmployeeId as SelectList, "All", new { @class = "form-control", onchange = "this.form.submit();" })
+    <div class="row">
+        <div class="col-md-3">
+                @Html.Label("Employee:")
+                @Html.DropDownList("employeeId", ViewBag.EmployeeId as SelectList, "All", new { @class = "form-control" })
+        </div>
+        <div class="col-md-3">
+                @Html.Label("Year:")
+                @Html.DropDownList("year", ViewBag.Year as SelectList, "All", new { @class = "form-control" })
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.Label("Quater:")
+                <select class="form-control" name="quater" id="quater">
+                    <option>
+                        ALL
+                    </option>
+                    <option value="1">
+                        1
+                    </option>
+                    <option value="2">
+                        2
+                    </option>
+                    <option value="3">
+                        3
+                    </option>
+                    <option value="4">
+                        4
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3" style="padding: 30px;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="button" class="btn btn-primary">Clear</button>
+        </div>
     </div>
+
 }
 
 
@@ -23,12 +62,30 @@
     <tbody>
         @foreach (var sales in Model)
         {
+            total = total + sales.Amount;
             <tr>
                 <td>@sales.Employee.FirstName</td>
                 <td>@sales.Quarter</td>
                 <td>@sales.Year</td>
-                <td>@sales.Amount</td>
+                <td>@sales.Amount.ToString("C", CultureInfo.CurrentCulture)</td>
             </tr>
         }
+        <tr>
+            <td colspan="3">TotalSales</td>
+            <td>@total.ToString("C", CultureInfo.CurrentCulture)</td>
+        </tr>
     </tbody>
 </table>
+<nav>
+    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new
+    {
+        page = page,
+        searchfor = @Context.Request.Query["searchfor"],
+        searchby = @Context.Request.Query["searchby"]
+    }),
+    new X.PagedList.Web.Common.PagedListRenderOptions
+    {
+        LiElementClasses = new string[] { "page-item" },
+        PageClasses = new string[] { "page-link" }
+    })
+</nav>

@@ -3,7 +3,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Quarterly_Sales_App.Models;
 using Quarterly_Sales_App.Models.Data;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using X.PagedList;
 
 namespace Quarterly_Sales_App.Controllers
 {
@@ -16,23 +21,80 @@ namespace Quarterly_Sales_App.Controllers
         }
 
         // GET: SalesData
-        public IActionResult Index(int? employeeId)
+        public async Task<IActionResult> Index(int? employeeId, int? year, int? quater, int? page)
         {
+            int pageSize = 3;
+            page = page.HasValue ? page : 1;
+            viewData();
             var salesData = _context.SalesData.Include(s => s.Employee).AsQueryable();
-
+            Expression<Func<SalesData, bool>> predicate = null;
             if (employeeId.HasValue)
             {
-                salesData = salesData.Where(s => s.EmployeeId == employeeId);
+                predicate = predicate != null ? predicate.And(x => x.EmployeeId == employeeId) : (x => x.EmployeeId == employeeId);
             }
-
-            ViewBag.EmployeeId = new SelectList(_context.Employees, "EmployeeId", "FullName");
-            return View(salesData.ToList());
+            if (year.HasValue)
+            {
+                predicate = predicate != null ? predicate.And(x => x.Year == year) : (x => x.Year == year);
+            }
+            if (quater.HasValue)
+            {
+                predicate = predicate != null ? predicate.And(x => x.Quarter == quater) : (x => x.Quarter == quater);
+            }
+            if (predicate != null)
+            {
+                salesData = salesData.Where(predicate);
+            }
+            //var pag = await PagingList<SalesData>.CreateAsync(salesData.AsNoTracking(), pageNumber ?? 1, pageSize);
+            var pag = salesData.ToPagedList(page ?? 1, pageSize);
+            return View(pag);
         }
+        private void viewData()
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+            var fooList = _context.Employees.ToList();
+            foreach (var item in fooList)
+            {
+                var data = new SelectListItem()
+                {
+                    Text = item.FirstName + " " + item.LastName,
+                    Value = item.EmployeeId.ToString()
+                };
+                list.Add(data);
+            }
+            var selectList = new SelectList(list, "Value", "Text");
+            ViewBag.EmployeeId = selectList;
+            List<SelectListItem> listYear = new List<SelectListItem>();
+            int startY = 2001;
+            for (int i = 0; i < 50; i++)
+            {
+                var data = new SelectListItem()
+                {
+                    Text = (2001 + i).ToString(),
+                    Value = (2001 + i).ToString()
+                };
+                listYear.Add(data);
+            }
+            var selectYear = new SelectList(listYear, "Value", "Text");
+            ViewBag.year = selectYear;
 
+        }
         // GET: SalesData/Create
         public IActionResult Create()
         {
-            ViewBag.Employees = _context.Employees.ToList();
+            List<SelectListItem> list = new List<SelectListItem>();
+            var AsQuerylabel = _context.Employees.AsQueryable();
+            var lstEmp = AsQuerylabel.ToList();
+            foreach (var item in lstEmp)
+            {
+                var data = new SelectListItem()
+                {
+                    Text = item.FirstName + " " + item.LastName,
+                    Value = item.EmployeeId.ToString()
+                };
+                list.Add(data);
+            }
+            var selectList = new SelectList(list, "Value", "Text");
+            ViewBag.Employees = selectList;
             return View();
         }
 

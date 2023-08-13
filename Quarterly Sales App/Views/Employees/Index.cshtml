@@ -1,8 +1,8 @@
-﻿@model List<SalesData>
+﻿@model List<Employee>
 
 <h2>Quarterly Sales Data</h2>
 
-@using (Html.BeginForm("Index", "SalesData", FormMethod.Get))
+@using (Html.BeginForm("Index", "Employees", FormMethod.Get))
 {
     <div class="form-group">
         @Html.Label("Filter by Employee:")
@@ -13,20 +13,32 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Employee</th>
-            <th>Quarter</th>
-            <th>Year</th>
-            <th>Amount</th>
+            <th>EmployeeId</th>
+            <th>FirstName</th>
+            <th>LastName</th>
+            <th>BOD</th>
+            <th>Hire Date</th>
+            <th>Manager</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var sales in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@sales.Employee.FirstName</td>
-                <td>@sales.Quarter</td>
-                <td>@sales.Year</td>
-                <td>@sales.Amount</td>
+                <td>@item.EmployeeId</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.DateOfBirth</td>
+                <td>@item.DateOfHire</td>
+                @if (item.Manager != null)
+                {
+                    <td>@item.Manager.FirstName</td>
+                }
+                else
+                {
+                    <td>N/A</td>
+                }
+
             </tr>
         }
     </tbody>

@@ -1,26 +1,55 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Quarterly_Sales_App.Models;
+using Quarterly_Sales_App.Models.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Quarterly_Sales_App.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly AppDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(AppDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
-
-        public IActionResult Index()
+        private void viewData()
         {
-            return View();
+            List<SelectListItem> list = new List<SelectListItem>();
+            var fooList = _context.Employees.ToList();
+            foreach (var item in fooList)
+            {
+                var data = new SelectListItem()
+                {
+                    Text = item.FirstName + " " + item.LastName,
+                    Value = item.EmployeeId.ToString()
+                };
+                list.Add(data);
+            }
+            var selectList = new SelectList(list, "Value", "Text");
+            ViewBag.EmployeeId = selectList;
+        }
+        public IActionResult Index(int? employeeId)
+        {
+            viewData();
+            var salesData = _context.SalesData.Include(s => s.Employee).AsQueryable();
+            var lstSale = new List<SalesData>();
+            if (employeeId.HasValue)
+            {
+                lstSale = salesData.Where(x => x.EmployeeId == employeeId).ToList();
+            }
+            else
+            {
+                lstSale = salesData.ToList();
+            }
+            return View(lstSale);
         }
 
         public IActionResult Privacy()
